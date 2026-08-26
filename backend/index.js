@@ -25,7 +25,8 @@ app.use(cors({
   credentials: true,
 }));
 
-app.options('*', cors()); // Gestion des requêtes de pré-vol
+// ❌ LA LIGNE SUIVANTE A ÉTÉ SUPPRIMÉE : app.options('*', cors()); 
+// ✅ Le middleware cors ci-dessus gère déjà les requêtes pré-vol.
 
 // Middleware pour lire le JSON
 app.use(express.json());
@@ -55,13 +56,9 @@ app.get('/', (req, res) => {
     res.send('Le serveur backend fonctionne !');
 });
 
-// Route de santé pour les pings (KEEP-ALIVE)
-app.get('/health', (req, res) => {
-    res.status(200).send('Backend est en vie');
-});
-
 // --- LE PORT POUR RENDER ---
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
