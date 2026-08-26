@@ -6,7 +6,7 @@ const app = express();
 
 // Configuration CORS (IMPORTANT : Remplacez par l'URL exacte de votre projet Frontend mis en ligne !)
 const allowedOrigins = [
-  'https://VOTRE-FRONTEND.vercel.app', // ⚠️ Remplacez par le lien exact de votre front (Vercel, Netlify, etc.)
+  'https://gestion-co-theta.vercel.app', // ⚠️ Remplacez par le lien exact de votre front (Vercel, Netlify, etc.)
   'http://localhost:5173',              // Pour le développement local
   'http://localhost:3000'
 ];
