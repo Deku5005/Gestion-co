@@ -55,11 +55,13 @@ app.get('/', (req, res) => {
     res.send('Le serveur backend fonctionne !');
 });
 
-// --- LE PORT POUR KOYEB ---
-// Koyeb injecte automatiquement la variable PORT dans l'environnement.
-const PORT = process.env.PORT || 3000;
+// Route de santé pour les pings (KEEP-ALIVE)
+app.get('/health', (req, res) => {
+    res.status(200).send('Backend est en vie');
+});
 
-// On démarre le serveur normalement (comme en local)
+// --- LE PORT POUR RENDER ---
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
