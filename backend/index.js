@@ -4,9 +4,9 @@ require('dotenv').config();
 
 const app = express();
 
-// Configuration CORS (IMPORTANT : Remplacez par l'URL exacte de votre projet Frontend sur Vercel !)
+// Configuration CORS (IMPORTANT : Remplacez par l'URL exacte de votre projet Frontend mis en ligne !)
 const allowedOrigins = [
-  'https://gestion-co-77uo.vercel.app', // ⚠️ Remplacez ceci par votre vrai lien Frontend Vercel
+  'https://VOTRE-FRONTEND.vercel.app', // ⚠️ Remplacez par le lien exact de votre front (Vercel, Netlify, etc.)
   'http://localhost:5173',              // Pour le développement local
   'http://localhost:3000'
 ];
@@ -25,8 +25,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// Gestion explicite des requêtes de pré-vol (Préflight) pour Vercel
-app.options('*', cors());
+app.options('*', cors()); // Gestion des requêtes de pré-vol
 
 // Middleware pour lire le JSON
 app.use(express.json());
@@ -56,6 +55,11 @@ app.get('/', (req, res) => {
     res.send('Le serveur backend fonctionne !');
 });
 
-// --- IMPORTANT POUR VERCEL ---
-// On n'écoute PAS le port, on exporte l'application pour que Vercel la gère.
-module.exports = app;
+// --- LE PORT POUR KOYEB ---
+// Koyeb injecte automatiquement la variable PORT dans l'environnement.
+const PORT = process.env.PORT || 3000;
+
+// On démarre le serveur normalement (comme en local)
+app.listen(PORT, () => {
+    console.log(`Serveur démarré sur le port ${PORT}`);
+});
