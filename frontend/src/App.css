@@ -1,0 +1,268 @@
+/* =========================================
+   IMPORT DE LA POLICE
+========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* =========================================
+   RESET & GLOBAL
+========================================= */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a; /* Fond sombre global */
+    color: #e2e8f0;
+    overflow: hidden; /* Empêche le scroll global */
+}
+
+/* =========================================
+   LAYOUT PRINCIPAL
+========================================= */
+.app-container { display: flex; height: 100vh; }
+
+/* Layout pour la page de connexion (sans sidebar) */
+.auth-wrapper { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    background-color: #0f172a; 
+}
+.auth-content { width: 100%; }
+
+/* =========================================
+   SIDEBAR (FIXE & CONSTANTE)
+========================================= */
+.navbar {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #1e293b;
+    border-right: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+/* En-tête de la Sidebar (Avatar) */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+.avatar-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    color: white;
+}
+.user-details { display: flex; flex-direction: column; flex-grow: 1; }
+.user-role { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+.user-name { font-weight: 600; font-size: 16px; color: white; }
+.chevron { color: #64748b; }
+
+/* Titre de section */
+.sidebar-section-title { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 10px; padding-left: 10px; }
+
+/* Liens de navigation */
+.links { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+.links::-webkit-scrollbar { width: 0px; }
+
+.links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #94a3b8;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.links a:hover, .links a.active {
+    background: #334155;
+    color: white;
+}
+
+/* Bouton de déconnexion (Toujours en bas) */
+.logout-container {
+    margin-top: auto;
+    border-top: 1px solid #334155;
+    padding-top: 15px;
+}
+.logout-container button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.logout-container button:hover { background: #dc2626; color: white; }
+
+/* =========================================
+   CONTENU PRINCIPAL (Zone scrollable)
+========================================= */
+.content { 
+    margin-left: 280px; /* Largeur exacte de la sidebar */
+    flex-grow: 1;
+    height: 100vh;
+    padding: 40px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+h1 { color: white; margin-bottom: 20px; font-weight: 600; }
+
+/* =========================================
+   FORMULAIRES PREMIUM (Style Dribbble)
+========================================= */
+.form-container {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.form-container label {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-container input, 
+.form-container select, 
+.form-container textarea {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #334155;
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-container input::placeholder, 
+.form-container textarea::placeholder { color: #475569; }
+
+/* Effet de focus "Glow" Violet */
+.form-container input:focus, 
+.form-container select:focus, 
+.form-container textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+/* =========================================
+   TABLEAUX PREMIUM
+========================================= */
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.stock-table th {
+    background: rgba(15, 23, 42, 0.9);
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 16px;
+    text-align: left;
+}
+
+.stock-table td {
+    padding: 16px;
+    border-bottom: 1px solid #334155;
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+.stock-table tbody tr:hover {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.stock-table button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-right: 5px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.stock-table button:hover { opacity: 0.9; }
+.stock-table button:first-of-type { background: #f59e0b; color: black; }
+.stock-table button:last-of-type { background: #ef4444; color: white; }
+
+/* =========================================
+   BOUTONS & LIENS D'ACTION
+========================================= */
+.form-container button, .action-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.form-container button:hover, .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+}
+
+/* =========================================
+   TAGS DE STATUT (Pour les tableaux)
+========================================= */
+.status-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+.status-pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+.status-validated { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+.status-delivered { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+
+/* =========================================
+   ÉCRAN DE CHARGEMENT
+========================================= */
+.loading-screen { display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-size: 1.2rem; }

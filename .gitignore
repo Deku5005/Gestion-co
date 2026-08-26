@@ -1,0 +1,25 @@
+# Dépendances (ne jamais les envoyer sur GitHub, on les réinstalle avec npm install)
+node_modules/
+
+# Dossiers de build (générés automatiquement par Vite et Express)
+dist/
+build/
+
+# Fichiers de variables d'environnement (CRITIQUE : contiennent vos mots de passe)
+.env
+.env.local
+.env.production
+
+# Fichiers de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Fichiers du système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Dossiers de l'éditeur de code
+.vscode/
+.idea/

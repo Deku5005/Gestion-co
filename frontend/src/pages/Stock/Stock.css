@@ -1,0 +1,7 @@
+/* frontend/src/pages/Stock/Stock.css */
+
+/* Les éléments .form-container et .stock-table sont déjà stylés dans App.css */
+/* On peut juste ajouter un peu d'espace pour le titre si besoin */
+h1 {
+    margin-top: 0;
+}

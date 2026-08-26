@@ -1,0 +1,63 @@
+/* Style Premium pour la Connexion / Inscription */
+.auth-container {
+    max-width: 420px;
+    margin: 50px auto;
+    padding: 40px;
+    border-radius: 24px;
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.auth-container h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.auth-container input {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #334155;
+    color: white;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.auth-container input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+.auth-container button {
+    width: 100%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    transition: transform 0.2s;
+}
+
+.auth-container button:hover {
+    transform: scale(1.02);
+}
+
+.auth-container a {
+    color: #8b5cf6;
+    text-decoration: none;
+    font-weight: 500;
+}
+.auth-container a:hover { text-decoration: underline; }
+.auth-container p { color: #f87171; text-align: center; }

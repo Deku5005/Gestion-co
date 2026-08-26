@@ -1,0 +1,26 @@
+/* Pour la page Profil */
+.auth-container {
+    max-width: 420px;
+    margin: 100px auto;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+.auth-container h2 { color: #fff; text-align: center; margin-bottom: 30px; font-weight: 700; }
+.auth-container input {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    width: 100%; padding: 14px; border-radius: 10px; margin-bottom: 15px;
+}
+.auth-container input::placeholder { color: rgba(255, 255, 255, 0.7); }
+.auth-container button {
+    width: 100%; padding: 14px;
+    background: linear-gradient(90deg, #a855f7, #7c3aed);
+    border: none; border-radius: 10px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer;
+}
+.auth-container button:hover { opacity: 0.9; }
