@@ -39,6 +39,4 @@ app.get('/', (req, res) => {
     res.send('Le serveur backend fonctionne !');
 });
 
-app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
+module.exports = app;
