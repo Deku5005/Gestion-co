@@ -266,3 +266,83 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
    ÉCRAN DE CHARGEMENT
 ========================================= */
 .loading-screen { display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-size: 1.2rem; }
+
+
+
+/* =========================================
+   MOBILE RESPONSIVE (Téléphone)
+========================================= */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.close-btn-mobile {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.mobile-overlay {
+    display: none;
+}
+
+/* Règles spécifiques aux petits écrans (moins de 768px) */
+@media (max-width: 768px) {
+    
+    /* On cache la sidebar par défaut sur mobile */
+    .navbar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        width: 280px;
+    }
+
+    /* Quand la classe "mobile-open" est ajoutée, la sidebar glisse à l'écran */
+    .navbar.mobile-open {
+        transform: translateX(0);
+        z-index: 2000;
+    }
+
+    /* Le bouton hamburger devient visible */
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    /* Le bouton X devient visible dans la sidebar mobile */
+    .close-btn-mobile {
+        display: block;
+    }
+
+    /* Le contenu ne garde plus sa marge gauche (plus de place pour la sidebar fixe) */
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    /* L'overlay sombre pour fermer le menu quand on clique à côté */
+    .mobile-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1500;
+    }
+
+    /* On réduit la taille de la police dans la sidebar pour que ce soit propre */
+    .navbar h2 { font-size: 1.2rem; }
+    .user-role, .user-name { font-size: 11px; }
+    .links a { font-size: 13px; padding: 10px; }
+}
