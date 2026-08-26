@@ -29,8 +29,8 @@ const Navbar = ({ isOpen, onClose }) => {
 
     return (
         <>
-            {/* Overlay sombre pour fermer le menu sur mobile */}
-            {isOpen && <div className="mobile-overlay" onClick={onClose}></div>}
+            {/* Overlay : Grok attend la classe "active" */}
+            <div className={`mobile-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}></div>
 
             <nav className={`navbar ${isOpen ? 'mobile-open' : ''}`}>
                 <div className="sidebar-header">
@@ -39,7 +39,6 @@ const Navbar = ({ isOpen, onClose }) => {
                         <span className="user-role">UTILISATEUR</span>
                         <span className="user-name">{user.nom}</span>
                     </div>
-                    {/* Bouton de fermeture sur mobile */}
                     <button className="close-btn-mobile" onClick={onClose}><X size={20} /></button>
                 </div>
 
@@ -85,7 +84,6 @@ function AppContent() {
             {user && <Navbar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />}
             
             <div className={user ? 'content' : 'auth-content'}>
-                {/* Bouton Hamburger visible uniquement sur mobile */}
                 {user && (
                     <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
                         <Menu size={24} />
@@ -93,7 +91,6 @@ function AppContent() {
                 )}
 
                 <Routes>
-                    {/* ... Vos routes existantes ... */}
                     <Route path="/login" element={user ? <Navigate to="/bilan" replace /> : <Login />} />
                     <Route path="/register" element={<ProtectedRoute allowedRoles={['Admin']}><Register /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
