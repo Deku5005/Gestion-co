@@ -16,7 +16,7 @@ body {
 h1 { color: white; margin-bottom: 20px; font-weight: 600; }
 
 /* =========================================
-   SIDEBAR - VERSION ORDINATEUR (Desktop)
+   SIDEBAR (Desktop > 1024px)
 ========================================= */
 .navbar {
     width: 280px;
@@ -32,8 +32,6 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
     box-sizing: border-box;
     z-index: 100;
 }
-
-/* En-tête Sidebar */
 .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
 .avatar-circle { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: flex; justify-content: center; align-items: center; font-weight: 700; color: white; }
 .user-details { display: flex; flex-direction: column; flex-grow: 1; }
@@ -41,64 +39,64 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
 .user-name { font-weight: 600; font-size: 16px; color: white; }
 .close-btn-mobile { display: none; }
 
-/* Liens */
 .sidebar-section-title { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 10px; padding-left: 10px; }
 .links { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; overflow-y: auto; padding-right: 5px; }
 .links::-webkit-scrollbar { width: 0px; }
 .links a { display: flex; align-items: center; gap: 12px; color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 10px; font-size: 14px; font-weight: 500; transition: 0.2s; }
 .links a:hover, .links a.active { background: #334155; color: white; }
 
-/* Déconnexion */
 .logout-container { margin-top: auto; border-top: 1px solid #334155; padding-top: 15px; }
 .logout-container button { display: flex; align-items: center; gap: 12px; width: 100%; background: transparent; color: #94a3b8; border: none; padding: 12px 15px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
 .logout-container button:hover { background: #dc2626; color: white; }
 
-/* Contenu principal Desktop */
 .content { margin-left: 280px; flex-grow: 1; height: 100vh; padding: 40px; overflow-y: auto; box-sizing: border-box; }
 
-/* Bouton Hamburger (Caché sur desktop) */
 .mobile-menu-btn { display: none; }
 .mobile-overlay { display: none; }
 
-/* =========================================
-   FORMULAIRES ET TABLEAUX (Commun)
-========================================= */
+/* Formulaires et Tableaux */
 .form-container { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
-.form-container input, .form-container select, .form-container textarea { background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; color: white; width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 15px; transition: all 0.3s ease; }
+.form-container input, .form-container select, .form-container textarea { background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; color: white; width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 15px; transition: all 0.3s ease; box-sizing: border-box; }
 .form-container input:focus, .form-container select:focus, .form-container textarea:focus { outline: none; border-color: #8b5cf6; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2); }
 .form-container button, .action-btn { background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%); border: none; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); transition: transform 0.2s; text-decoration: none; display: inline-block; font-size: 14px; }
 .form-container button:hover, .action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); }
+
+/* Tableaux Responsive (Défilement horizontal si trop large) */
+.table-container { overflow-x: auto; }
 .stock-table { width: 100%; border-collapse: collapse; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
-.stock-table th { background: rgba(15, 23, 42, 0.9); color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; padding: 16px; text-align: left; }
-.stock-table td { padding: 16px; border-bottom: 1px solid #334155; color: #e2e8f0; font-size: 14px; }
-.stock-table button { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; margin-right: 5px; font-weight: 500; }
+.stock-table th { background: rgba(15, 23, 42, 0.9); color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; padding: 16px; text-align: left; white-space: nowrap; }
+.stock-table td { padding: 16px; border-bottom: 1px solid #334155; color: #e2e8f0; font-size: 14px; white-space: nowrap; }
+.stock-table button { padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; margin-right: 5px; font-weight: 500; }
+
 .loading-screen { display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-size: 1.2rem; }
 
 /* =========================================
-   MOBILE RESPONSIVE (Tous les téléphones)
-   (Réglé pour iPhone X, SE, Samsung, etc.)
+   MEDIA QUERY 1 : MOYEN (Tablettes, 769px - 1024px)
+========================================= */
+@media (max-width: 1024px) {
+    .navbar { width: 240px; }
+    .content { margin-left: 240px; }
+}
+
+/* =========================================
+   MEDIA QUERY 2 : PETIT (Téléphones standards, 481px - 768px)
+   (Samsung Galaxy A17, iPhone XR, etc.)
 ========================================= */
 @media (max-width: 768px) {
-    
-    /* 1. La Sidebar est CACHÉE par défaut */
     .navbar {
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
-        width: 260px;
-        height: 100vh;
+        width: 280px;
+        padding-top: calc(20px + env(safe-area-inset-top)); /* Gère l'encoche iPhone */
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Gère la barre du bas */
     }
 
-    /* 2. Quand on clique sur le bouton, elle glisse à l'écran */
-    .navbar.mobile-open {
-        transform: translateX(0);
-        z-index: 2000;
-    }
+    .navbar.mobile-open { transform: translateX(0); z-index: 2000; }
 
-    /* 3. Le bouton Hamburger devient VISIBLE */
     .mobile-menu-btn {
         display: block;
         position: absolute;
-        top: 20px;
+        top: calc(20px + env(safe-area-inset-top));
         left: 20px;
         background: #1e293b;
         color: white;
@@ -110,7 +108,6 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
         box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
 
-    /* 4. Le bouton X devient visible dans la sidebar */
     .close-btn-mobile {
         display: block;
         background: none;
@@ -120,16 +117,15 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
         margin-left: auto;
     }
 
-    /* 5. Le CONTENU PRINCIPAL occupe 100% de l'écran */
     .content {
         margin-left: 0;
         width: 100%;
         padding: 20px;
-        padding-top: 60px; /* Pour laisser la place au bouton hamburger */
+        padding-top: calc(60px + env(safe-area-inset-top)); /* Place pour le bouton hamburger */
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
         box-sizing: border-box;
     }
 
-    /* 6. Fond sombre pour fermer le menu */
     .mobile-overlay {
         display: block;
         position: fixed;
@@ -140,4 +136,70 @@ h1 { color: white; margin-bottom: 20px; font-weight: 600; }
         background: rgba(0, 0, 0, 0.7);
         z-index: 1500;
     }
+
+    /* Ajustements pour les formulaires et tableaux sur mobile */
+    .form-container { padding: 20px; }
+    .form-container input, .form-container select { font-size: 16px; } /* Évite le zoom automatique sur iPhone */
+    
+    /* S'assurer que les tableaux ne sortent pas de l'écran */
+    .table-container { overflow-x: auto; }
+    .stock-table { min-width: 600px; } /* Force le scroll horizontal si trop de colonnes */
 }
+
+/* =========================================
+   MEDIA QUERY 3 : TRÈS PETIT (iPhone SE, Samsung Galaxy A03, 480px et moins)
+========================================= */
+@media (max-width: 480px) {
+    .navbar { width: 240px; } /* Sidebar plus étroite pour les très petits écrans */
+    
+    .links a { font-size: 13px; padding: 10px 12px; } /* Liens plus compacts */
+    .user-name { font-size: 14px; }
+    
+    .content { padding: 15px; padding-top: calc(60px + env(safe-area-inset-top)); }
+    
+    .form-container { padding: 15px; }
+    .form-container button { width: 100%; } /* Boutons pleine largeur sur petits écrans */
+    
+    .action-btn { width: 100%; text-align: center; }
+}
+
+/* =========================================
+   PAGE DE CONNEXION (RESPONSIVE)
+========================================= */
+.auth-container {
+    max-width: 400px;
+    width: 90%; /* S'adapte à tous les téléphones */
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 20px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+}
+.auth-container h2 { color: white; text-align: center; margin-bottom: 30px; }
+.auth-container input {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: white;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+.auth-container button {
+    width: 100%;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+}
+.auth-container button:hover { background: #7c3aed; }
+.auth-container p { color: #f87171; text-align: center; }
+.auth-container a { color: #8b5cf6; text-decoration: none; }
