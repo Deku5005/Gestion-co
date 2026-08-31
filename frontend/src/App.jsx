@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LayoutDashboard, Package, ShoppingCart, Users, Truck, Wallet, LogOut, Menu, X, Download } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Truck, Wallet, LogOut, Menu, X, Download, ClipboardList } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import Login from './pages/Login';
@@ -78,8 +78,9 @@ const Navbar = ({ isOpen, onClose }) => {
                     
                     {(user.role === 'Admin' || user.role === 'Stock') && (
                         <>
-                            <Link to="/stock" className={isActive('/stock')} onClick={onClose}><Package size={18} /> Stock</Link>
-                            <Link to="/fournisseurs" className={isActive('/fournisseurs')} onClick={onClose}><Truck size={18} /> Fournisseurs</Link>
+                             <Link to="/stock" className={isActive('/stock')} onClick={onClose}><Package size={18} /> Stock</Link>
+                             <Link to="/fournisseurs" className={isActive('/fournisseurs')} onClick={onClose}><Truck size={18} /> Fournisseurs</Link>
+                             <Link to="/inventaire" className={isActive('/inventaire')} onClick={onClose}><ClipboardList size={18} /> Inventaire</Link>
                         </>
                     )}
                     
