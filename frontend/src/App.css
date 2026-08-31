@@ -187,6 +187,30 @@ h1 {
     color: white;
 }
 
+/* Bouton Installer l'App (PWA) */
+.install-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: clamp(0.85rem, 2.2vw, 0.9rem);
+    font-weight: 500;
+    transition: background var(--transition), color var(--transition);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.install-btn:hover {
+    background: var(--border);
+    color: white;
+}
+
 .logout-container {
     margin-top: auto;
     border-top: 1px solid var(--border);

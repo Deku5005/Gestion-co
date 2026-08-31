@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LayoutDashboard, Package, ShoppingCart, Users, Truck, Wallet, LogOut, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Truck, Wallet, LogOut, Menu, X, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -27,9 +27,37 @@ const Navbar = ({ isOpen, onClose }) => {
     const location = useLocation();
     const isActive = (path) => location.pathname.startsWith(path) ? 'active' : '';
 
+    // ------- LOGIQUE PWA (Installation) -------
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isInstalled, setIsInstalled] = useState(false);
+
+    useEffect(() => {
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            setIsInstalled(true);
+            return;
+        }
+        const handler = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        window.addEventListener('appinstalled', () => setIsInstalled(true));
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
+
+    const handleInstall = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setDeferredPrompt(null);
+        }
+    };
+    // ------------------------------------------
+
     return (
         <>
-            {/* Overlay : Grok attend la classe "active" */}
+            {/* Overlay pour fermer le menu mobile */}
             <div className={`mobile-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}></div>
 
             <nav className={`navbar ${isOpen ? 'mobile-open' : ''}`}>
@@ -64,6 +92,17 @@ const Navbar = ({ isOpen, onClose }) => {
 
                     <Link to="/profile" className={isActive('/profile')} onClick={onClose}><Users size={18} /> Mon Profil</Link>
                 </div>
+
+                {/* ------- SECTION APPLICATION (PWA) ------- */}
+                <div className="sidebar-section-title">APPLICATION</div>
+                {!isInstalled && deferredPrompt && (
+                    <div className="links">
+                        <button className="install-btn" onClick={handleInstall}>
+                            <Download size={18} /> Installer l'App
+                        </button>
+                    </div>
+                )}
+                {/* ------------------------------------------- */}
 
                 <div className="logout-container">
                     <button onClick={() => { logout(); onClose(); }}><LogOut size={18} /> Log Out</button>
