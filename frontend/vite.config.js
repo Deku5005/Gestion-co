@@ -16,7 +16,7 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
-          // Tu devras ajouter des icônes dans le dossier public/ plus tard
+          // Tu devras ajouter des icônes dans le dossier public/ plus tard/bien sur
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
         ]
