@@ -8,6 +8,7 @@ const Inventaire = () => {
     const [articles, setArticles] = useState([]);
     const [counts, setCounts] = useState({});
     const [message, setMessage] = useState('');
+    const [date, setDate] = useState(new Date().toLocaleDateString('fr-FR'));
 
     useEffect(() => {
         loadArticles();
@@ -44,12 +45,23 @@ const Inventaire = () => {
         }
     };
 
+    // Fonction pour imprimer
+    const handlePrint = () => {
+        window.print();
+    };
+
     return (
         <div>
-            <h1>Inventaire Physique</h1>
+            {/* Titre et Date */}
+            <div className="print-header">
+                <h1>Inventaire Physique</h1>
+                <p className="print-date">Date de l'inventaire : {date}</p>
+            </div>
+
             {message && <p className="message">{message}</p>}
-            <p style={{ color: '#94a3b8' }}>Comptez vos articles en rayon et saisissez la quantité réelle.</p>
+            <p style={{ color: '#94a3b8' }} className="print-instruction">Comptez vos articles en rayon et saisissez la quantité réelle.</p>
             
+            {/* Tableau */}
             <div className="table-container">
                 <table className="stock-table">
                     <thead>
@@ -85,9 +97,15 @@ const Inventaire = () => {
                 </table>
             </div>
 
-            <button className="action-btn" onClick={handleValidate} style={{ marginTop: '20px' }}>
-                Valider l'Inventaire
-            </button>
+            {/* Boutons (Cachés à l'impression) */}
+            <div className="no-print">
+                <button className="action-btn" onClick={handleValidate} style={{ marginRight: '10px' }}>
+                    Valider l'Inventaire
+                </button>
+                <button className="action-btn print-btn" onClick={handlePrint}>
+                    🖨️ Imprimer
+                </button>
+            </div>
         </div>
     );
 };

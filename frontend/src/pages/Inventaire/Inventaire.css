@@ -1,3 +1,4 @@
+/* Styles normaux (à l'écran) */
 .count-input {
     width: 80px;
     padding: 8px;
@@ -12,4 +13,78 @@
     color: #4ade80;
     font-weight: bold;
     margin-bottom: 15px;
+}
+
+.print-btn {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+}
+.print-btn:hover {
+    box-shadow: 0 6px 18px rgba(100, 116, 139, 0.5);
+}
+
+/* Styles spécifiques pour l'impression (@media print) */
+@media print {
+    /* Cacher la sidebar, les boutons et le bouton hamburger */
+    .navbar, .mobile-menu-btn, .mobile-overlay, .no-print, .print-instruction {
+        display: none !important;
+    }
+
+    /* Le contenu prend toute la page */
+    .content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    /* Titre et date */
+    .print-header {
+        margin-bottom: 20px;
+    }
+    .print-header h1 {
+        color: black;
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    .print-date {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    /* Tableau en noir et blanc, sans fond sombre */
+    .table-container {
+        overflow: visible !important;
+    }
+    .stock-table {
+        min-width: 0 !important;
+        width: 100% !important;
+        border: 1px solid #000 !important;
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+    }
+    .stock-table th {
+        background: #ddd !important;
+        color: black !important;
+        border-bottom: 2px solid #000 !important;
+    }
+    .stock-table td {
+        background: white !important;
+        color: black !important;
+        border-bottom: 1px solid #ccc !important;
+    }
+    
+    /* Champs de saisie imprimés comme du texte */
+    .count-input {
+        border: none !important;
+        background: transparent !important;
+        color: black !important;
+        font-size: 1rem !important;
+    }
+
+    /* Forcer l'impression des couleurs (si le navigateur le permet) */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
