@@ -71,3 +71,21 @@ CREATE TABLE IF NOT EXISTS achats (
     prix_achat DECIMAL NOT NULL,
     date_achat DATE DEFAULT CURRENT_DATE
 );
+-- Table des sessions d'inventaire
+CREATE TABLE IF NOT EXISTS inventaires (
+    id SERIAL PRIMARY KEY,
+    date_inventaire DATE DEFAULT CURRENT_DATE,
+    utilisateur_id INT REFERENCES utilisateurs(id),
+    statut VARCHAR(50) DEFAULT 'En cours' -- 'En cours' ou 'Validé'
+);
+
+-- Table du journal des mouvements de stock (Traçabilité)
+CREATE TABLE IF NOT EXISTS mouvements_stock (
+    id SERIAL PRIMARY KEY,
+    article_id INT REFERENCES articles(id),
+    type_mouvement VARCHAR(50) NOT NULL, -- 'Vente', 'Achat', 'Ajustement', 'Perte'
+    quantite INT NOT NULL, -- Quantité positive (entrée) ou négative (sortie)
+    date_mouvement TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    utilisateur_id INT REFERENCES utilisateurs(id),
+    commentaire TEXT
+);

@@ -40,6 +40,7 @@ const ventesRoutes = require('./routes/ventes');
 const depensesRoutes = require('./routes/depenses');
 const achatsRoutes = require('./routes/achats');
 const bilanRoutes = require('./routes/bilan');
+const inventairesRoutes = require('./routes/inventaires');
 
 // --- UTILISATION DES ROUTES ---
 app.use('/api/articles', articlesRoutes);
@@ -50,6 +51,7 @@ app.use('/api/ventes', ventesRoutes);
 app.use('/api/depenses', depensesRoutes);
 app.use('/api/achats', achatsRoutes);
 app.use('/api/bilan', bilanRoutes);
+app.use('/api/inventaires', inventairesRoutes);
 
 // Route de test (optionnelle)
 app.get('/', (req, res) => {

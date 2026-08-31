@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import Inventaire from './pages/Inventaire/Inventaire'
 import StockList from './pages/Stock/StockList';
 import StockForm from './pages/Stock/StockForm';
 import ClientsList from './pages/Clients/ClientsList';
@@ -154,6 +154,7 @@ function AppContent() {
                     <Route path="/ventes/new" element={<ProtectedRoute allowedRoles={['Admin', 'Vendeur']}><VentesForm /></ProtectedRoute>} />
 
                     <Route path="/bilan" element={<ProtectedRoute><Bilan /></ProtectedRoute>} />
+                    <Route path="/inventaire" element={<ProtectedRoute allowedRoles={['Admin', 'Stock']}><Inventaire /></ProtectedRoute>} />
                     
                     <Route path="/" element={ user ? <Navigate to="/bilan" replace /> : <Navigate to="/login" replace /> } />
                 </Routes>
