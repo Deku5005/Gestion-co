@@ -9,7 +9,12 @@ const Bilan = () => {
 
     useEffect(() => {
         api.get('/bilan').then(res => setStats(res.data));
-        api.get('/bilan/charts').then(res => setChartData(res.data));
+        api.get('/bilan/charts')
+            .then(res => {
+            // Sécurité : si ce n'est pas un tableau, on met un tableau vide
+            setChartData(Array.isArray(res.data) ? res.data : []);
+        })
+    .catch(() => setChartData([]));
     }, []);
 
     if (!stats) return <div className="loading-screen">Chargement du bilan...</div>;

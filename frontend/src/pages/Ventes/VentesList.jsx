@@ -10,10 +10,23 @@ const VentesList = () => {
     useEffect(() => { loadVentes(); }, []);
 
     const loadVentes = async () => {
-        const res = await api.get('/ventes');
-        setVentes(res.data.ventes);
-        setTotalJour(res.data.total_jour);
-    };
+    const res = await api.get('/ventes');
+    
+    // Si l'ancien backend renvoie un tableau direct
+    if (Array.isArray(res.data)) {
+        const today = new Date().toISOString().split('T')[0];
+        const total = res.data
+            .filter(v => v.date_vente === today)
+            .reduce((sum, v) => sum + parseFloat(v.montant_total), 0);
+        setVentes(res.data);
+        setTotalJour(total);
+    } 
+    // Si le nouveau backend renvoie l'objet { ventes, total_jour }
+    else {
+        setVentes(res.data.ventes || []);
+        setTotalJour(res.data.total_jour || 0);
+    }
+};
 
     const updateStatut = async (id, nouveauStatut) => {
         await api.put(`/ventes/${id}`, { statut_livraison: nouveauStatut });
