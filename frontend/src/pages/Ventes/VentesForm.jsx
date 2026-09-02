@@ -27,14 +27,25 @@ const VentesForm = () => {
         }
     }, [id, isEditing]);
 
-    const handleSubmit = async (e) => {
+       const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // On nettoie les données pour éviter les erreurs PostgreSQL
+            const dataToSend = {
+                ...form,
+                // Si client_id est vide, on envoie null (et non "")
+                client_id: form.client_id === '' ? null : form.client_id,
+                // On s'assure que les nombres sont bien des nombres
+                quantite: parseInt(form.quantite) || 1,
+                prix_vente: parseFloat(form.prix_vente) || 0,
+                article_id: form.article_id ? parseInt(form.article_id) : null,
+            };
+
             if (isEditing) {
-                await api.put(`/ventes/${id}`, form);
+                await api.put(`/ventes/${id}`, dataToSend);
                 alert('Vente modifiée !');
             } else {
-                await api.post('/ventes', form);
+                await api.post('/ventes', dataToSend);
                 alert('Vente enregistrée !');
             }
             navigate('/ventes');
