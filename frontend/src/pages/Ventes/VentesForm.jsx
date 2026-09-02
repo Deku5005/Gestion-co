@@ -4,50 +4,76 @@ import api from '../../api/client';
 import './Ventes.css';
 
 const VentesForm = () => {
-    const { id } = useParams(); // Pour la modification
+    const { id } = useParams();
     const navigate = useNavigate();
     const isEditing = Boolean(id);
 
+    // Nouveau champ pour le paiement supplémentaire
+    const [nouveauPaiement, setNouveauPaiement] = useState(0);
+
     const [articles, setArticles] = useState([]);
     const [clients, setClients] = useState([]);
-    const [form, setForm] = useState({ article_id: '', client_id: '', quantite: 1, prix_vente: 0, montant_paye: 0, mode_paiement: 'Espèces', statut_livraison: 'En attente' });
+    const [form, setForm] = useState({ 
+        article_id: '', 
+        client_id: '', 
+        quantite: 1, 
+        prix_vente: 0, 
+        montant_paye: 0, 
+        mode_paiement: 'Espèces', 
+        statut_livraison: 'En attente' 
+    });
 
-    // Calcul automatique du TOTAL et du RESTE
+    // Calculs automatiques
     const totalCalcul = (parseFloat(form.prix_vente) || 0) * (parseInt(form.quantite) || 0);
-    const resteCalcul = Math.max(0, totalCalcul - (parseFloat(form.montant_paye) || 0));
+    const ancienPaye = parseFloat(form.montant_paye) || 0;
+    const nouveauPaye = ancienPaye + (parseFloat(nouveauPaiement) || 0);
+    const resteCalcul = Math.max(0, totalCalcul - nouveauPaye);
 
     useEffect(() => {
         api.get('/articles').then(res => setArticles(res.data));
         api.get('/clients').then(res => setClients(res.data));
+
+        // CHARGEMENT DES DONNÉES EXISTANTES POUR L'ÉDITION
         if (isEditing) {
-            api.get(`/ventes`).then(res => {
+            api.get('/ventes').then(res => {
                 const vente = res.data.ventes.find(v => v.id == id);
-                if (vente) setForm({ ...vente });
+                if (vente) {
+                    setForm({ 
+                        article_id: vente.article_id || '',
+                        client_id: vente.client_id || '',
+                        quantite: vente.quantite || 1,
+                        prix_vente: vente.prix_vente || 0,
+                        montant_paye: vente.montant_paye || 0,
+                        mode_paiement: vente.mode_paiement || 'Espèces',
+                        statut_livraison: vente.statut_livraison || 'En attente'
+                    });
+                }
             });
         }
     }, [id, isEditing]);
 
-       const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // On nettoie les données pour éviter les erreurs PostgreSQL
+            // On envoie le montant total payé (ancien + nouveau)
             const dataToSend = {
                 ...form,
-                // Si client_id est vide, on envoie null (et non "")
+                montant_paye: nouveauPaye,
                 client_id: form.client_id === '' ? null : form.client_id,
-                // On s'assure que les nombres sont bien des nombres
+                article_id: form.article_id ? parseInt(form.article_id) : null,
                 quantite: parseInt(form.quantite) || 1,
                 prix_vente: parseFloat(form.prix_vente) || 0,
-                article_id: form.article_id ? parseInt(form.article_id) : null,
             };
 
             if (isEditing) {
                 await api.put(`/ventes/${id}`, dataToSend);
-                alert('Vente modifiée !');
+                alert('Vente modifiée avec succès !');
             } else {
                 await api.post('/ventes', dataToSend);
                 alert('Vente enregistrée !');
             }
+            
+            // Retour à la liste (qui se mettra à jour automatiquement)
             navigate('/ventes');
         } catch (err) {
             alert('Erreur : ' + err.response?.data);
@@ -81,16 +107,28 @@ const VentesForm = () => {
                 <label>Prix Unitaire (FCFA)</label>
                 <input type="number" value={form.prix_vente} onChange={(e) => setForm({ ...form, prix_vente: e.target.value })} required />
 
-                {/* CALCUL AUTOMATIQUE */}
                 <div className="total-calc-box">
-                    <p>Total à payer : <strong>{totalCalcul.toLocaleString()} FCFA</strong></p>
+                    <p>Total de la commande : <strong>{totalCalcul.toLocaleString()} FCFA</strong></p>
                 </div>
 
-                <label>Montant Payé (FCFA)</label>
-                <input type="number" value={form.montant_paye} onChange={(e) => setForm({ ...form, montant_paye: e.target.value })} />
+                {/* AFFICHAGE DU DÉJÀ PAYÉ (Si modification) */}
+                {isEditing && (
+                    <div className="info-paye-box">
+                        <p>Déjà payé : <strong>{ancienPaye.toLocaleString()} FCFA</strong></p>
+                    </div>
+                )}
 
-                {/* RESTE A PAYER */}
+                {/* CHAMP POUR PAYER ENCORE */}
+                <label>Payer maintenant (FCFA)</label>
+                <input 
+                    type="number" 
+                    value={nouveauPaiement} 
+                    onChange={(e) => setNouveauPaiement(e.target.value)} 
+                    placeholder="Ex: 2500"
+                />
+
                 <div className="reste-calc-box">
+                    <p>Total payé : <strong>{nouveauPaye.toLocaleString()} FCFA</strong></p>
                     <p>Reste à payer : <strong>{resteCalcul.toLocaleString()} FCFA</strong></p>
                 </div>
 
@@ -101,7 +139,7 @@ const VentesForm = () => {
                     <option>Crédit</option>
                 </select>
 
-                <button type="submit">{isEditing ? "Modifier la Vente" : "Valider la Vente"}</button>
+                <button type="submit">{isEditing ? "Mettre à jour la Vente" : "Valider la Vente"}</button>
             </form>
         </div>
     );

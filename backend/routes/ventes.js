@@ -7,10 +7,12 @@ router.get('/', async (req, res) => {
     try {
         const ventes = await pool.query('SELECT * FROM ventes ORDER BY id DESC');
         
-        // Calcul du total des ventes du jour (date actuelle)
-        const today = new Date().toISOString().split('T')[0];
+        // Calcul du total des ventes du jour (basé sur l'heure locale)
+        const today = new Date().toLocaleDateString('fr-CA'); // Format YYYY-MM-DD
         const totalJour = ventes.rows
-            .filter(v => new Date(v.date_vente).toISOString().split('T')[0] === today)
+            .filter(v => v.date_vente instanceof Date 
+                ? v.date_vente.toLocaleDateString('fr-CA') === today 
+                : String(v.date_vente).split('T')[0] === today)
             .reduce((sum, v) => sum + parseFloat(v.montant_total), 0);
 
         res.json({ ventes: ventes.rows, total_jour: totalJour });
@@ -23,7 +25,7 @@ router.post('/', async (req, res) => {
     try {
         await pool.query('BEGIN');
 
-        // 1. NETTOYAGE DES DONNÉES (IMPORTANT pour éviter les erreurs PostgreSQL)
+        // NETTOYAGE DES DONNÉES (Important pour éviter les erreurs PostgreSQL)
         const cleanClientId = client_id === '' || client_id === undefined ? null : parseInt(client_id);
         const cleanArticleId = article_id === '' || article_id === undefined ? null : parseInt(article_id);
         const cleanQuantite = parseInt(quantite) || 0;
@@ -35,21 +37,21 @@ router.post('/', async (req, res) => {
         const paye = cleanMontantPaye;
         const reste = Math.max(0, montant_total - paye);
 
-        // 2. Vérifier le stock (en utilisant les valeurs nettoyées)
+        // 1. Vérifier le stock
         const stockCheck = await pool.query('SELECT quantite_disponible FROM articles WHERE id = $1', [cleanArticleId]);
         if (stockCheck.rows.length === 0) throw new Error('Article introuvable');
         if (stockCheck.rows[0].quantite_disponible < cleanQuantite) throw new Error('Stock insuffisant');
 
-        // 3. Décrémenter le stock (en utilisant les valeurs nettoyées)
+        // 2. Décrémenter le stock
         await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [cleanQuantite, cleanArticleId]);
 
-        // 4. Enregistrer la vente
+        // 3. Enregistrer la vente
         const result = await pool.query(
             'INSERT INTO ventes (article_id, client_id, date_vente, montant_total, montant_paye, reste, mode_paiement, statut_livraison) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7) RETURNING *',
             [cleanArticleId, cleanClientId, montant_total, paye, reste, mode_paiement, statut_livraison || 'En attente']
         );
 
-        // 5. Si reste > 0 et qu'il y a un client : on ajoute la dette au solde du client !
+        // 4. Si reste > 0 et qu'il y a un client : on ajoute la dette au solde du client !
         if (reste > 0 && cleanClientId) {
             await pool.query('UPDATE clients SET solde_credit = solde_credit + $1 WHERE id = $2', [reste, cleanClientId]);
         }
@@ -62,7 +64,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT : Modifier une vente (et corriger le stock!)
+// PUT : Modifier une vente (et corriger le stock et la dette client !)
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { article_id, quantite, prix_vente, montant_paye, statut_livraison, client_id } = req.body;
@@ -98,7 +100,7 @@ router.put('/:id', async (req, res) => {
         // 4. Décrémenter le nouveau stock
         await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [cleanQuantite, cleanArticleId]);
 
-        // 5. Mettre à jour le crédit client si nécessaire (Annuler l'ancien, ajouter le nouveau)
+        // 5. Mettre à jour le crédit client (Annuler l'ancienne dette, ajouter la nouvelle)
         if (old.client_id) {
             await pool.query('UPDATE clients SET solde_credit = solde_credit - $1 WHERE id = $2', [old.reste, old.client_id]);
         }
