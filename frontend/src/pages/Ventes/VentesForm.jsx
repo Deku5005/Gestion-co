@@ -11,7 +11,6 @@ const VentesForm = () => {
     const [articles, setArticles] = useState([]);
     const [clients, setClients] = useState([]);
     
-    // État du formulaire principal
     const [form, setForm] = useState({ 
         article_id: '', 
         client_id: '', 
@@ -22,20 +21,21 @@ const VentesForm = () => {
         statut_livraison: 'En attente' 
     });
 
-    // Nouveau champ pour payer encore
-    const [nouveauPaiement, setNouveauPaiement] = useState(0);
+    // Nouveau champ "Montant à ajouter"
+    const [montantAAjouter, setMontantAAjouter] = useState(0);
 
-    // CALCULS AUTOMATIQUES (Mis à jour à chaque rendu)
+    // CALCULS AUTOMATIQUES (Robustes contre les NaN)
     const totalCalcul = (parseFloat(form.prix_vente) || 0) * (parseInt(form.quantite) || 0);
     const montantDejaPaye = parseFloat(form.montant_paye) || 0;
-    const totalPaye = montantDejaPaye + (parseFloat(nouveauPaiement) || 0);
+    const nouveauPaye = parseFloat(montantAAjouter) || 0;
+    
+    const totalPaye = montantDejaPaye + nouveauPaye;
     const resteCalcul = Math.max(0, totalCalcul - totalPaye);
 
     useEffect(() => {
         api.get('/articles').then(res => setArticles(res.data));
         api.get('/clients').then(res => setClients(res.data));
 
-        // Chargement des données pour la modification
         if (isEditing) {
             api.get('/ventes').then(res => {
                 const vente = res.data.ventes.find(v => v.id == id);
@@ -49,23 +49,27 @@ const VentesForm = () => {
                         mode_paiement: vente.mode_paiement || 'Espèces',
                         statut_livraison: vente.statut_livraison || 'En attente'
                     });
-                    setNouveauPaiement(0); // On repart de zéro pour le nouveau paiement
+                    setMontantAAjouter(0); // On remet à zéro le champ d'ajout
                 }
             });
         }
     }, [id, isEditing]);
 
+    // Fonction pour nettoyer les données et éviter le NaN
+    const safeInt = (val) => { const n = parseInt(val); return isNaN(n) ? null : n; };
+    const safeFloat = (val) => { const n = parseFloat(val); return isNaN(n) ? 0 : n; };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // On additionne le déjà payé + le nouveau paiement
+            // Nettoyage strict : on envoie null si vide, jamais NaN
             const dataToSend = {
                 ...form,
-                montant_paye: totalPaye, 
-                client_id: form.client_id === '' ? null : form.client_id,
-                article_id: form.article_id ? parseInt(form.article_id) : null,
-                quantite: parseInt(form.quantite) || 1,
-                prix_vente: parseFloat(form.prix_vente) || 0,
+                client_id: safeInt(form.client_id),
+                article_id: safeInt(form.article_id),
+                quantite: safeInt(form.quantite) || 1,
+                prix_vente: safeFloat(form.prix_vente),
+                montant_paye: totalPaye, // On envoie le total payé (ancien + ajout)
             };
 
             if (isEditing) {
@@ -75,6 +79,8 @@ const VentesForm = () => {
                 await api.post('/ventes', dataToSend);
                 alert('Vente enregistrée !');
             }
+            
+            // Retour à la liste (elle se rechargera automatiquement)
             navigate('/ventes');
         } catch (err) {
             alert('Erreur : ' + err.response?.data);
@@ -102,8 +108,7 @@ const VentesForm = () => {
                     {clients.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
                 </select>
 
-                {/* La quantité doit bien mettre à jour le total */}
-                <label>Quantité</label>
+                <label>Quantité (Le total se met à jour automatiquement)</label>
                 <input type="number" min="1" value={form.quantite} onChange={(e) => setForm({ ...form, quantite: e.target.value })} required />
 
                 <label>Prix Unitaire (FCFA)</label>
@@ -113,19 +118,18 @@ const VentesForm = () => {
                     <p>Total de la commande : <strong>{totalCalcul.toLocaleString()} FCFA</strong></p>
                 </div>
 
-                {/* Affichage du déjà payé si modification */}
                 {isEditing && (
                     <div className="info-paye-box">
                         <p>Déjà payé : <strong>{montantDejaPaye.toLocaleString()} FCFA</strong></p>
                     </div>
                 )}
 
-                {/* CHAMP POUR PAYER ENCORE */}
-                <label>Payer maintenant (FCFA)</label>
+                {/* CHAMP "MONTANT À AJOUTER" */}
+                <label>Montant à ajouter (FCFA)</label>
                 <input 
                     type="number" 
-                    value={nouveauPaiement} 
-                    onChange={(e) => setNouveauPaiement(e.target.value)} 
+                    value={montantAAjouter} 
+                    onChange={(e) => setMontantAAjouter(e.target.value)} 
                     placeholder="Ex: 2500"
                 />
 
