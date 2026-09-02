@@ -1,0 +1,17 @@
+.total-calc-box, .reste-calc-box {
+    background: rgba(15, 23, 42, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.total-calc-box strong { color: #4ade80; font-size: 1.2rem; }
+.reste-calc-box strong { color: #f87171; font-size: 1.2rem; }
+.daily-total-box {
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: white;
+}
+.daily-total-amount { font-size: 2rem; font-weight: 800; }

@@ -2,58 +2,100 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
-// GET : Liste des ventes
+// GET : Liste de toutes les ventes + Total du jour
 router.get('/', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM ventes ORDER BY id DESC');
-        res.json(result.rows);
+        const ventes = await pool.query('SELECT * FROM ventes ORDER BY id DESC');
+        
+        // Calcul du total des ventes du jour (date actuelle)
+        const today = new Date().toISOString().split('T')[0];
+        const totalJour = ventes.rows
+            .filter(v => new Date(v.date_vente).toISOString().split('T')[0] === today)
+            .reduce((sum, v) => sum + parseFloat(v.montant_total), 0);
+
+        res.json({ ventes: ventes.rows, total_jour: totalJour });
     } catch (err) { res.status(500).send(err.message); }
 });
 
-// POST : Enregistrer une vente (et décrémenter le stock !)
+// POST : Enregistrer une vente (avec paiement partiel et crédit client)
 router.post('/', async (req, res) => {
-    const client = req.body;
+    const { article_id, client_id, quantite, prix_vente, mode_paiement, montant_paye, statut_livraison } = req.body;
     try {
-        // On démarre une transaction pour être sûr que tout se passe bien
         await pool.query('BEGIN');
         
-        // 1. Vérifier le stock disponible
-        const stockCheck = await pool.query('SELECT quantite_disponible FROM articles WHERE id = $1', [client.article_id]);
-        if (stockCheck.rows[0].quantite_disponible < client.quantite) {
-            throw new Error('Stock insuffisant');
-        }
+        // Calculs
+        const montant_total = parseFloat(prix_vente) * parseInt(quantite);
+        const paye = montant_paye ? parseFloat(montant_paye) : 0;
+        const reste = Math.max(0, montant_total - paye);
+
+        // 1. Vérifier le stock
+        const stockCheck = await pool.query('SELECT quantite_disponible FROM articles WHERE id = $1', [article_id]);
+        if (stockCheck.rows[0].quantite_disponible < quantite) throw new Error('Stock insuffisant');
 
         // 2. Décrémenter le stock
-        await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [client.quantite, client.article_id]);
+        await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [quantite, article_id]);
 
         // 3. Enregistrer la vente
         const result = await pool.query(
-            'INSERT INTO ventes (article_id, client_id, date_vente, montant_total, mode_paiement, statut_livraison) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5) RETURNING *',
-            [client.article_id, client.client_id, (client.prix_vente * client.quantite), client.mode_paiement, client.statut_livraison || 'En attente']
+            'INSERT INTO ventes (article_id, client_id, date_vente, montant_total, montant_paye, reste, mode_paiement, statut_livraison) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7) RETURNING *',
+            [article_id, client_id, montant_total, paye, reste, mode_paiement, statut_livraison || 'En attente']
         );
 
-        // 4. Valider la transaction
+        // 4. Si reste > 0 et qu'il y a un client : on ajoute la dette au solde du client !
+        if (reste > 0 && client_id) {
+            await pool.query('UPDATE clients SET solde_credit = solde_credit + $1 WHERE id = $2', [reste, client_id]);
+        }
+
         await pool.query('COMMIT');
         res.json(result.rows[0]);
-
     } catch (err) {
-        await pool.query('ROLLBACK'); // Annuler tout si erreur
+        await pool.query('ROLLBACK');
         res.status(400).send(err.message);
     }
 });
-// PUT : Mettre à jour le statut d'une vente (ex: "En attente" -> "Validée" -> "Livrée")
+
+// PUT : Modifier une vente (et corriger le stock!)
 router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { article_id, quantite, prix_vente, montant_paye, statut_livraison, client_id } = req.body;
     try {
-        const { id } = req.params;
-        const { statut_livraison } = req.body;
-        
-        const result = await pool.query(
-            'UPDATE ventes SET statut_livraison = $1 WHERE id = $2 RETURNING *',
-            [statut_livraison, id]
+        await pool.query('BEGIN');
+
+        // Récupérer l'ancienne vente
+        const oldSale = await pool.query('SELECT * FROM ventes WHERE id = $1', [id]);
+        if (oldSale.rows.length === 0) throw new Error('Vente introuvable');
+        const old = oldSale.rows[0];
+
+        // 1. Remettre l'ancien article en stock
+        await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible + $1 WHERE id = $2', [old.quantite, old.article_id]);
+
+        // 2. Calculer le nouveau total
+        const montant_total = parseFloat(prix_vente) * parseInt(quantite);
+        const paye = montant_paye ? parseFloat(montant_paye) : 0;
+        const reste = Math.max(0, montant_total - paye);
+
+        // 3. Mettre à jour la vente
+        await pool.query(
+            'UPDATE ventes SET article_id=$1, client_id=$2, quantite=$3, prix_vente=$4, montant_total=$5, montant_paye=$6, reste=$7, statut_livraison=$8 WHERE id=$9',
+            [article_id, client_id, quantite, prix_vente, montant_total, paye, reste, statut_livraison, id]
         );
-        res.json(result.rows[0]);
+
+        // 4. Décrémenter le nouveau stock
+        await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [quantite, article_id]);
+
+        // 5. Mettre à jour le crédit client si nécessaire (Annuler l'ancien, ajouter le nouveau)
+        if (old.client_id) {
+            await pool.query('UPDATE clients SET solde_credit = solde_credit - $1 WHERE id = $2', [old.reste, old.client_id]);
+        }
+        if (reste > 0 && client_id) {
+            await pool.query('UPDATE clients SET solde_credit = solde_credit + $1 WHERE id = $2', [reste, client_id]);
+        }
+
+        await pool.query('COMMIT');
+        res.json({ message: 'Vente modifiée avec succès' });
     } catch (err) {
-        res.status(500).send(err.message);
+        await pool.query('ROLLBACK');
+        res.status(400).send(err.message);
     }
 });
 

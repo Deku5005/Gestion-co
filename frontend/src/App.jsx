@@ -156,6 +156,7 @@ function AppContent() {
 
                     <Route path="/bilan" element={<ProtectedRoute><Bilan /></ProtectedRoute>} />
                     <Route path="/inventaire" element={<ProtectedRoute allowedRoles={['Admin', 'Stock']}><Inventaire /></ProtectedRoute>} />
+                    <Route path="/ventes/edit/:id" element={<ProtectedRoute allowedRoles={['Admin', 'Vendeur']}><VentesForm /></ProtectedRoute>} />
                     
                     <Route path="/" element={ user ? <Navigate to="/bilan" replace /> : <Navigate to="/login" replace /> } />
                 </Routes>
