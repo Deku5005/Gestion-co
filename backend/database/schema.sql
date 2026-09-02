@@ -69,6 +69,8 @@ CREATE TABLE ventes (
     article_id INT REFERENCES articles(id),
     client_id INT REFERENCES clients(id),
     date_vente DATE DEFAULT CURRENT_DATE,
+    quantite INT DEFAULT 1,
+    prix_vente DECIMAL DEFAULT 0,
     montant_total DECIMAL,
     montant_paye DECIMAL DEFAULT 0,
     reste DECIMAL DEFAULT 0,

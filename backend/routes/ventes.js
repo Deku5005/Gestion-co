@@ -6,13 +6,9 @@ const pool = require('../config/db');
 router.get('/', async (req, res) => {
     try {
         const ventes = await pool.query('SELECT * FROM ventes ORDER BY id DESC');
-        
-        // Calcul du total des ventes du jour (basé sur l'heure locale)
-        const today = new Date().toLocaleDateString('fr-CA'); // Format YYYY-MM-DD
+        const today = new Date().toLocaleDateString('fr-CA');
         const totalJour = ventes.rows
-            .filter(v => v.date_vente instanceof Date 
-                ? v.date_vente.toLocaleDateString('fr-CA') === today 
-                : String(v.date_vente).split('T')[0] === today)
+            .filter(v => new Date(v.date_vente).toLocaleDateString('fr-CA') === today)
             .reduce((sum, v) => sum + parseFloat(v.montant_total), 0);
 
         res.json({ ventes: ventes.rows, total_jour: totalJour });
@@ -25,10 +21,10 @@ router.post('/', async (req, res) => {
     try {
         await pool.query('BEGIN');
 
-        // NETTOYAGE DES DONNÉES (Important pour éviter les erreurs PostgreSQL)
+        // NETTOYAGE DES DONNÉES
         const cleanClientId = client_id === '' || client_id === undefined ? null : parseInt(client_id);
         const cleanArticleId = article_id === '' || article_id === undefined ? null : parseInt(article_id);
-        const cleanQuantite = parseInt(quantite) || 0;
+        const cleanQuantite = parseInt(quantite) || 1;
         const cleanPrixVente = parseFloat(prix_vente) || 0;
         const cleanMontantPaye = montant_paye ? parseFloat(montant_paye) : 0;
 
@@ -45,13 +41,13 @@ router.post('/', async (req, res) => {
         // 2. Décrémenter le stock
         await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [cleanQuantite, cleanArticleId]);
 
-        // 3. Enregistrer la vente
+        // 3. Enregistrer la vente (avec quantite et prix_vente)
         const result = await pool.query(
-            'INSERT INTO ventes (article_id, client_id, date_vente, montant_total, montant_paye, reste, mode_paiement, statut_livraison) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7) RETURNING *',
-            [cleanArticleId, cleanClientId, montant_total, paye, reste, mode_paiement, statut_livraison || 'En attente']
+            'INSERT INTO ventes (article_id, client_id, date_vente, quantite, prix_vente, montant_total, montant_paye, reste, mode_paiement, statut_livraison) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+            [cleanArticleId, cleanClientId, cleanQuantite, cleanPrixVente, montant_total, paye, reste, mode_paiement, statut_livraison || 'En attente']
         );
 
-        // 4. Si reste > 0 et qu'il y a un client : on ajoute la dette au solde du client !
+        // 4. Crédit client si reste > 0
         if (reste > 0 && cleanClientId) {
             await pool.query('UPDATE clients SET solde_credit = solde_credit + $1 WHERE id = $2', [reste, cleanClientId]);
         }
@@ -71,10 +67,10 @@ router.put('/:id', async (req, res) => {
     try {
         await pool.query('BEGIN');
 
-        // NETTOYAGE DES DONNÉES pour la modification
+        // NETTOYAGE
         const cleanClientId = client_id === '' || client_id === undefined ? null : parseInt(client_id);
         const cleanArticleId = article_id === '' || article_id === undefined ? null : parseInt(article_id);
-        const cleanQuantite = parseInt(quantite) || 0;
+        const cleanQuantite = parseInt(quantite) || 1;
         const cleanPrixVente = parseFloat(prix_vente) || 0;
         const cleanMontantPaye = montant_paye ? parseFloat(montant_paye) : 0;
 
@@ -100,7 +96,7 @@ router.put('/:id', async (req, res) => {
         // 4. Décrémenter le nouveau stock
         await pool.query('UPDATE articles SET quantite_disponible = quantite_disponible - $1 WHERE id = $2', [cleanQuantite, cleanArticleId]);
 
-        // 5. Mettre à jour le crédit client (Annuler l'ancienne dette, ajouter la nouvelle)
+        // 5. Mettre à jour le crédit client
         if (old.client_id) {
             await pool.query('UPDATE clients SET solde_credit = solde_credit - $1 WHERE id = $2', [old.reste, old.client_id]);
         }

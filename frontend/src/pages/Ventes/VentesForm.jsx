@@ -8,32 +8,34 @@ const VentesForm = () => {
     const navigate = useNavigate();
     const isEditing = Boolean(id);
 
-    // Nouveau champ pour le paiement supplémentaire
-    const [nouveauPaiement, setNouveauPaiement] = useState(0);
-
     const [articles, setArticles] = useState([]);
     const [clients, setClients] = useState([]);
+    
+    // État du formulaire principal
     const [form, setForm] = useState({ 
         article_id: '', 
         client_id: '', 
         quantite: 1, 
         prix_vente: 0, 
-        montant_paye: 0, 
+        montant_paye: 0, // Montant déjà payé (si modification)
         mode_paiement: 'Espèces', 
         statut_livraison: 'En attente' 
     });
 
-    // Calculs automatiques
+    // Nouveau champ pour payer encore
+    const [nouveauPaiement, setNouveauPaiement] = useState(0);
+
+    // CALCULS AUTOMATIQUES (Mis à jour à chaque rendu)
     const totalCalcul = (parseFloat(form.prix_vente) || 0) * (parseInt(form.quantite) || 0);
-    const ancienPaye = parseFloat(form.montant_paye) || 0;
-    const nouveauPaye = ancienPaye + (parseFloat(nouveauPaiement) || 0);
-    const resteCalcul = Math.max(0, totalCalcul - nouveauPaye);
+    const montantDejaPaye = parseFloat(form.montant_paye) || 0;
+    const totalPaye = montantDejaPaye + (parseFloat(nouveauPaiement) || 0);
+    const resteCalcul = Math.max(0, totalCalcul - totalPaye);
 
     useEffect(() => {
         api.get('/articles').then(res => setArticles(res.data));
         api.get('/clients').then(res => setClients(res.data));
 
-        // CHARGEMENT DES DONNÉES EXISTANTES POUR L'ÉDITION
+        // Chargement des données pour la modification
         if (isEditing) {
             api.get('/ventes').then(res => {
                 const vente = res.data.ventes.find(v => v.id == id);
@@ -47,6 +49,7 @@ const VentesForm = () => {
                         mode_paiement: vente.mode_paiement || 'Espèces',
                         statut_livraison: vente.statut_livraison || 'En attente'
                     });
+                    setNouveauPaiement(0); // On repart de zéro pour le nouveau paiement
                 }
             });
         }
@@ -55,10 +58,10 @@ const VentesForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // On envoie le montant total payé (ancien + nouveau)
+            // On additionne le déjà payé + le nouveau paiement
             const dataToSend = {
                 ...form,
-                montant_paye: nouveauPaye,
+                montant_paye: totalPaye, 
                 client_id: form.client_id === '' ? null : form.client_id,
                 article_id: form.article_id ? parseInt(form.article_id) : null,
                 quantite: parseInt(form.quantite) || 1,
@@ -72,8 +75,6 @@ const VentesForm = () => {
                 await api.post('/ventes', dataToSend);
                 alert('Vente enregistrée !');
             }
-            
-            // Retour à la liste (qui se mettra à jour automatiquement)
             navigate('/ventes');
         } catch (err) {
             alert('Erreur : ' + err.response?.data);
@@ -101,6 +102,7 @@ const VentesForm = () => {
                     {clients.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
                 </select>
 
+                {/* La quantité doit bien mettre à jour le total */}
                 <label>Quantité</label>
                 <input type="number" min="1" value={form.quantite} onChange={(e) => setForm({ ...form, quantite: e.target.value })} required />
 
@@ -111,10 +113,10 @@ const VentesForm = () => {
                     <p>Total de la commande : <strong>{totalCalcul.toLocaleString()} FCFA</strong></p>
                 </div>
 
-                {/* AFFICHAGE DU DÉJÀ PAYÉ (Si modification) */}
+                {/* Affichage du déjà payé si modification */}
                 {isEditing && (
                     <div className="info-paye-box">
-                        <p>Déjà payé : <strong>{ancienPaye.toLocaleString()} FCFA</strong></p>
+                        <p>Déjà payé : <strong>{montantDejaPaye.toLocaleString()} FCFA</strong></p>
                     </div>
                 )}
 
@@ -127,8 +129,9 @@ const VentesForm = () => {
                     placeholder="Ex: 2500"
                 />
 
+                {/* Calculs dynamiques */}
                 <div className="reste-calc-box">
-                    <p>Total payé : <strong>{nouveauPaye.toLocaleString()} FCFA</strong></p>
+                    <p>Total payé : <strong>{totalPaye.toLocaleString()} FCFA</strong></p>
                     <p>Reste à payer : <strong>{resteCalcul.toLocaleString()} FCFA</strong></p>
                 </div>
 
